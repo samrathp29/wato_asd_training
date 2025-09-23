@@ -4,23 +4,23 @@ CostmapNode::CostmapNode()
 : Node("costmap"), 
   costmap_(robot::CostmapCore(this->get_logger())) 
 {
-  // Declare ROS parameters with defaults
+  // declare ROS parameters with defaults
   this->declare_parameter("inflation_radius", INFLATION_RADIUS);
   this->declare_parameter("max_cost", MAX_COST);
   this->declare_parameter("resolution", RESOLUTION);
   this->declare_parameter("width", WIDTH);
   this->declare_parameter("height", HEIGHT);
 
-  // Debug/test string publisher
+  // debug/test string publisher
   string_pub_ = this->create_publisher<std_msgs::msg::String>("/test_topic", 10);
   timer_ = this->create_wall_timer(
     std::chrono::milliseconds(500),
     std::bind(&CostmapNode::publishMessage, this));
 
-  // Actual costmap publisher
+  // actual costmap publisher
   costmap_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/costmap", 10);
 
-  // Subscribe to LIDAR topic
+  // subscribe to LIDAR topic
   lidar_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
     "/lidar", 10,
     std::bind(&CostmapNode::lidarCallback, this, std::placeholders::_1));
@@ -35,7 +35,7 @@ bool CostmapNode::isValidGridCell(int gx, int gy) const {
 }
 
 void CostmapNode::toGridCoordinates(double wx, double wy, int &gx, int &gy) const {
-  // World origin at map center
+  // world origin at map center
   const double origin_x = -(WIDTH * RESOLUTION) / 2.0;
   const double origin_y = -(HEIGHT * RESOLUTION) / 2.0;
 
@@ -127,7 +127,7 @@ void CostmapNode::publishCostmap(
 
   out.data.resize(WIDTH * HEIGHT);
 
-  // Flatten row-major grid
+  // flatten row-major grid
   for (int j = 0; j < HEIGHT; ++j) {
     for (int i = 0; i < WIDTH; ++i) {
       out.data[j * WIDTH + i] = grid[i][j];
